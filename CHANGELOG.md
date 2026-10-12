@@ -78,6 +78,11 @@ with its reasoning and attachments.
 - **An embedded binary resource is read when the model can read it.** An image
   blob becomes an image input and an audio blob an audio input. Any other blob
   keeps its placeholder, now with its MIME type.
+
+## 1.6.8
+
+### Fixed
+
 - **A bare `sigit.exe` exits 0.** Windows has no terminal UI, and launching the
   binary with no arguments returned an error code, which winget's installer
   validation treats as a broken package. It now prints how to start ACP and
