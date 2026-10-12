@@ -1,14 +1,54 @@
 # Changelog
 
-## 1.6.7
+## 1.7.0
+
+Finishes the Agent Client Protocol v1 surface. An editor can now delete a
+thread, show a context meter, tell one message from the next, cancel a request
+by its id and page through a long thread list, and a reopened thread comes back
+with its reasoning and attachments.
+
+### Added
+
+- **`session/delete`.** A thread removed in the editor is removed from disk, so
+  it no longer comes back in "Import Threads". A turn still running on it is
+  stopped first, and deleting an id that is already gone succeeds (#192).
+- **A saved thread reports its title and time as they change.** Each save sends
+  a `session_info_update` with a fresh `updatedAt`, and the title the first time
+  there is one. A new thread used to stay untitled in the sidebar until the next
+  `session/list` (#193).
+- **Context usage.** A `usage_update` follows every model response, so an editor
+  can show how full the context window is. `used` is the endpoint's own token
+  count when it gives one and an estimate otherwise, which is always the case
+  on-device (#194).
+- **Message ids.** Every message chunk carries a `messageId`. An inference round
+  is one message, so its reply and its reasoning share an id and the round after
+  a tool call starts a new one (#195).
+- **Sign-in through the editor.** For a client that advertises URL-mode
+  elicitation, `authenticate` hands it the sign-in page instead of launching a
+  browser from the agent. The user sees where they are being sent, and sign-in
+  works where siGit Code has no browser to open (#197).
+- **The Inference switch is a toggle** for a client that renders boolean config
+  options. Other clients keep the two-value select (#198).
+- **Deny for the session.** A permission prompt offers "deny for this session"
+  next to "allow for this session", so a tool the user does not want is not
+  asked about again in that thread (#199).
+- **`$/cancel_request`.** A client can cancel a request by its JSON-RPC id. For
+  `session/prompt` that stops the turn and the command it is running exactly as
+  `session/cancel` does, and the prompt is answered with the `cancelled` stop
+  reason. For `authenticate` it ends the wait on the browser and the request is
+  answered `-32800`. The notification used to be ignored.
+- **`session/list` is paged.** A reply holds at most 100 threads and a
+  `nextCursor` when there are more. The cursor names the last thread on the
+  page instead of counting an offset, so the next page is right when a thread is
+  saved or deleted in between. A cursor the agent did not hand out is rejected
+  with `-32602`; `cursor` used to be ignored.
 
 ### Fixed
 
-- **A cancel that arrives before the turn starts is no longer lost.** A prompt
-  now registers for `session/cancel` as soon as it begins, not once it reaches
-  inference. A cancel that lands while the turn is queued on the workspace,
-  switching threads, loading a model, or running a slash command ends it with
-  `cancelled` instead of `end_turn`.
+- **A reopened thread shows its reasoning and attachments.** `session/load`
+  replayed only the text of each message. The model's reasoning now comes back
+  as `agent_thought_chunk` under the reply's `messageId`, and the images and
+  audio clips of a user message come back as `image` and `audio` blocks.
 - **Cancelling a turn stops the command it is running.** A foreground
   `run_command` used to run to its own end (up to two minutes) before the turn
   noticed the cancel. A cancel or `session/close` now kills the process tree, or
@@ -38,6 +78,20 @@
 - **An embedded binary resource is read when the model can read it.** An image
   blob becomes an image input and an audio blob an audio input. Any other blob
   keeps its placeholder, now with its MIME type.
+- **A bare `sigit.exe` exits 0.** Windows has no terminal UI, and launching the
+  binary with no arguments returned an error code, which winget's installer
+  validation treats as a broken package. It now prints how to start ACP and
+  headless mode and exits cleanly.
+
+## 1.6.7
+
+### Fixed
+
+- **A cancel that arrives before the turn starts is no longer lost.** A prompt
+  now registers for `session/cancel` as soon as it begins, not once it reaches
+  inference. A cancel that lands while the turn is queued on the workspace,
+  switching threads, loading a model, or running a slash command ends it with
+  `cancelled` instead of `end_turn`.
 - **A prompt that is only audio is answered.** A clip with no text or image used
   to end the turn at once with nothing sent to the model, even though the agent
   advertises audio.
