@@ -1508,6 +1508,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "directories"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16f5094c54661b38d03bd7e50df373292118db60b585c08a411c6d840017fe7d"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1615,11 +1624,56 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e1d926b4d407d372f141f93bb444696142c29d32962ccbd3531117cf3aa0bfa9"
 
 [[package]]
+name = "ed-acp"
+version = "1.2.2"
+dependencies = [
+ "agent-client-protocol",
+ "anyhow",
+ "async-trait",
+ "base64 0.23.1",
+ "directories",
+ "ed-mcp 1.2.2",
+ "futures",
+ "reqwest 0.13.4",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tracing-subscriber",
+ "uuid 1.26.0",
+]
+
+[[package]]
+name = "ed-acp-testkit"
+version = "1.2.2"
+dependencies = [
+ "serde_json",
+ "tokio",
+ "uuid 1.26.0",
+]
+
+[[package]]
 name = "ed-mcp"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf0c6ab7e27186954295ce7974b33d65860cd3b5073848e9d0a5b3eed90f68a2"
 dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "rmcp",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "ed-mcp"
+version = "1.2.2"
+dependencies = [
+ "agent-client-protocol",
  "anyhow",
  "futures",
  "http",
@@ -5908,7 +5962,7 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "crossterm",
- "ed-mcp",
+ "ed-mcp 1.2.0",
  "futures",
  "libc",
  "log",
@@ -5921,11 +5975,33 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "sigit-agent",
  "tokio",
  "tokio-util",
  "toml 0.8.23",
  "tracing-subscriber",
  "url",
+ "uuid 1.26.0",
+]
+
+[[package]]
+name = "sigit-agent"
+version = "1.6.7"
+dependencies = [
+ "agent-client-protocol",
+ "anyhow",
+ "async-trait",
+ "base64 0.22.1",
+ "ed-acp",
+ "ed-acp-testkit",
+ "log",
+ "rand 0.9.5",
+ "reqwest 0.13.4",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "toml 0.8.23",
  "uuid 1.26.0",
 ]
 
